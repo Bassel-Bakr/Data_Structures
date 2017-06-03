@@ -17,25 +17,25 @@ class Treap {
         if(r == null) return l
         
         if(l.y < r.y) {
-        	l.r = join(l.r, r)
+          l.r = join(l.r, r)
             return l.upd()
         } else {
-        	r.l = join(l, r.l)
+          r.l = join(l, r.l)
             return r.upd()
         }
     }
     
     fun split(p: Node?, x: Int): Pair<Node?, Node?> {
         if(p == null)
-        	return Pair(null, null)
+            return Pair(null, null)
         
         if(x < p.x) {
-        	var (l, r) = split(p.l, x)
+            var (l, r) = split(p.l, x)
             p.l = r
             r = p.upd()
             return Pair(l, r)
         } else {
-        	var (l, r) = split(p.r, x)
+          var (l, r) = split(p.r, x)
             p.r = l
             l = p.upd()
             return Pair(l, r)
@@ -57,22 +57,22 @@ class Treap {
     
     fun remove(p: Node?, x: Int): Node? {
         if(p == null)
-        	return null
+          return null
         
         if(x == p.x)
-        	return join(p.l, p.r)
+          return join(p.l, p.r)
         
         if(x < p.x)
-        	p.l = remove(p.l, x)
+          p.l = remove(p.l, x)
         else
-        	p.r = remove(p.r, x)
+          p.r = remove(p.r, x)
         
         return p.upd()
     }
     
     fun print(p: Node?): Int {
         if(p == null)
-        	return 0
+          return 0
         
         val l = print(p.l)
         println(p.x)        
@@ -87,7 +87,7 @@ fun main(args: Array<String>) {
     val t = Treap()
 
     for(i in 0 until n)
-    	t.insert(i)
+      t.insert(i)
     
     t.print()
 }
