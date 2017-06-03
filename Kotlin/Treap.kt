@@ -1,7 +1,8 @@
 class Treap {
     data class Node(var x: Int,
                     var l: Node? = null, var r: Node? = null,
-                    var s: Int = 1, val y: Int = (Math.random() * 100_000).toInt())
+                    var s: Int = 1,
+                    val y: Int = (Math.random() * 100_000).toInt())
     
     fun Node.upd(): Node {
         s = 1
@@ -77,7 +78,7 @@ class Treap {
         println(p.x)        
         val r = print(p.r)
         
-        return intArrayOf(l, r).max()!! + 1
+        return 1 + Math.max(l, r)
     }
 }
 
