@@ -83,9 +83,9 @@ class Treap {
 }
 
 fun main(args: Array<String>) {
-    val n = 100
-    
+    val n = 100    
     val t = Treap()
+
     for(i in 0 until n)
     	t.insert(i)
     
