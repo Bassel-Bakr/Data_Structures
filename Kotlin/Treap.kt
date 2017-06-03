@@ -26,19 +26,18 @@ class Treap {
     }
     
     fun split(p: Node?, x: Int): Pair<Node?, Node?> {
-        if(p == null)
-            return Pair(null, null)
-        
-        if(x < p.x) {
+        return if(p == null)
+            Pair(null, null)
+        else if(x < p.x) {
             var (l, r) = split(p.l, x)
             p.l = r
             r = p.upd()
-            return Pair(l, r)
+            Pair(l, r)
         } else {
             var (l, r) = split(p.r, x)
             p.r = l
             l = p.upd()
-            return Pair(l, r)
+            Pair(l, r)
         }
     }
     
