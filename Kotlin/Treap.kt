@@ -35,7 +35,7 @@ class Treap {
             r = p.upd()
             return Pair(l, r)
         } else {
-          var (l, r) = split(p.r, x)
+            var (l, r) = split(p.r, x)
             p.r = l
             l = p.upd()
             return Pair(l, r)
