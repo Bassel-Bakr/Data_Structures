@@ -8,7 +8,7 @@ class Treap {
         s += l?.s ?: 0
         s += r?.s ?: 0
         return this
-	}
+    }
     
     var root: Node? = null
     
@@ -22,8 +22,8 @@ class Treap {
         } else {
         	r.l = join(l, r.l)
             return r.upd()
-		}
-	}
+        }
+    }
     
     fun split(p: Node?, x: Int): Pair<Node?, Node?> {
         if(p == null)
@@ -39,21 +39,21 @@ class Treap {
             p.r = l
             l = p.upd()
             return Pair(l, r)
-		}
-	}
+        }
+    }
     
     fun insert(x: Int) {
         val (l, r) = split(root, x)
         root = join(l, join(Node(x), r))
-	}
+    }
     
     fun remove(x: Int) {
         root = remove(root, x)
-	}
+    }
     
     fun print(): Int {
         return print(root)
-	}
+    }
     
     fun remove(p: Node?, x: Int): Node? {
         if(p == null)
@@ -68,7 +68,7 @@ class Treap {
         	p.r = remove(p.r, x)
         
         return p.upd()
-	}
+    }
     
     fun print(p: Node?): Int {
         if(p == null)
