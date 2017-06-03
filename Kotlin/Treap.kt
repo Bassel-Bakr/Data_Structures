@@ -78,7 +78,7 @@ class Treap {
         println(p.x)        
         val r = print(p.r)
         
-        return 1 + intArrayOf(l, r).max()!!
+        return intArrayOf(l, r).max()!! + 1
     }
 }
 
