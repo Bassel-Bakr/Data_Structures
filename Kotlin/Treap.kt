@@ -1,6 +1,7 @@
 class Treap {
     data class Node(var x: Int,
-                    var l: Node? = null, var r: Node? = null,
+                    var l: Node? = null,
+                    var r: Node? = null,
                     var s: Int = 1,
                     val y: Int = (Math.random() * 100_000).toInt())
     
