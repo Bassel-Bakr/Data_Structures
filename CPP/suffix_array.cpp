@@ -65,7 +65,7 @@ struct suffix_array {
 		for (int i = 0; i < n; ++i)
 			sa[i] = suf[i].i;
 	}
-	
+
 	void build_lcp(string const &w) {
 	  lcp.resize(n);
 	  for(int i = 0, k = 0; i < n; ++i, k -= k>0) {
@@ -74,13 +74,13 @@ struct suffix_array {
 	      k = 0;
 	    } else {
 	      while(sa[idx]+k < n && sa[idx+1]+k < n &&
-	                w[sa[idx]+k] == w[sa[idx+1]+k])
-	                k++;
+			w[sa[idx]+k] == w[sa[idx+1]+k])
+			k++;
 	    }
 	    lcp[idx] = k;
 	  }
 	}	
-	
+
 	int operator[](int i) {
 	  return sa[i];
 	}
