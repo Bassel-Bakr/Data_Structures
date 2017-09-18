@@ -74,8 +74,8 @@ struct suffix_array {
         k = 0;
       } else {
         while(sa[idx]+k < n && sa[idx+1]+k < n &&
-      w[sa[idx]+k] == w[sa[idx+1]+k])
-      k++;
+              w[sa[idx]+k] == w[sa[idx+1]+k])
+          k++;
       }
       lcp[idx] = k;
     }
