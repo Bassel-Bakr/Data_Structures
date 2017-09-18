@@ -2,13 +2,13 @@
 
 using namespace std;
 
-struct suffix_array {
+struct suffix_array {  
+  int n;
+  vector<int> sa, lcp, rev, rad;
+  
   struct suffix {
   	int i, x, y;
   };
-  
-  int n;
-  vector<int> sa, lcp, rev, rad;
 
 	void radix_sort(vector<suffix>& suf, vector<suffix>& tmp) {
 		int mx = 0;
