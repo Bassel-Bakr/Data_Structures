@@ -86,8 +86,7 @@ struct suffix_array {
 	}
 };
 
-int main()
-{
+int main() {
 	cin.tie(0);
 	cin.sync_with_stdio(0);
 
