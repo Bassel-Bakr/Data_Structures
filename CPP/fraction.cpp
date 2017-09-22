@@ -83,6 +83,10 @@ struct fraction {
     return (x==b.x && y==b.y);
   }
 
+  bool operator!=(fraction const& b) const {
+    return not (*this == b);
+  }
+
   bool operator<(fraction const& b) const {
     return x*b.y < y*b.x;
   }
