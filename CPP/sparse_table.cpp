@@ -31,7 +31,7 @@ struct sparse_table {
     }
   }
   
-  T query(int l, int r) {
+  T query(int l, int r) const {
     int b = 31 - __builtin_clz(r-l+1);
     T const& x = st[b][l];
     T const& y = st[b][r-(1<<b)+1];
