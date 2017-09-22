@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+using ll = long long;
 
 struct fraction {
   using T = ll;
