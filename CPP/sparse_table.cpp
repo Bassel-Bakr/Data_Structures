@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+
 template<class T, class F = less<T>>
 struct sparse_table {
   int n;
