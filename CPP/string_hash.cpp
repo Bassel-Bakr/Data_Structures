@@ -26,19 +26,14 @@ struct string_hash {
     ll x = 1, y = 0;
     iter it = l;
     for(int i = 0; i < n; ++i) {
-      x = x * p % mod;
-      y = (y*p + *it++ - 'a' + 1) % mod;
-      f[i+1] = x;
-      h[i+1] = y;
+      f[i+1] = x = x * p % mod;
+      h[i+1] = y = (y*p + *it++ - 'a' + 1) % mod;
     }
   }
 
   int query(int l, int r) {
-    ll x = h[r+1];
-    x -= 1ll * h[l] * f[r-l+1] % mod;
-    x += mod;
-    x %= mod;
-    return x;
+    ll x = h[r+1] - 1ll * h[l] * f[r-l+1] % mod;
+    return (x + mod) % mod;
   }
 };
 
