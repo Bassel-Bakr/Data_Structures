@@ -18,7 +18,7 @@ int dfs(int u, int p) {
   tour.emplace_back(u);
 
   for(int v : g[u]) {
-    if(v == u)
+    if(v == p)
       continue;
     dfs(v, u);
     tour.emplace_back(u);
