@@ -74,10 +74,12 @@ int main() {
   }
 
   tin.resize(n+1);
+  dist.resize(n+1);
+  
   tour.reserve(2*n-1);
 
   dfs(1, 0);
   build();
 
-  
+
 }
