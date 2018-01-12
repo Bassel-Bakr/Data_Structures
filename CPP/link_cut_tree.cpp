@@ -1,3 +1,7 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
 struct node {
   int x;
   node *l = 0;
@@ -39,7 +43,7 @@ struct lct {
     auto g = p->p;
 
     if(!p->is_root())
-      g->push(), (g->r == p ? g->r : g->l) = c;
+      (g->r == p ? g->r : g->l) = c;
 
     p->push();
     c->push();
@@ -54,8 +58,8 @@ struct lct {
       if(p->r) p->r->p = p;
     }
 
-    c->p = g;
     p->p = c;
+    c->p = g;
   }
 
   void splay(node* c) {
