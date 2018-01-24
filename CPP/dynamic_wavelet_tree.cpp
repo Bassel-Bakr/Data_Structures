@@ -227,9 +227,10 @@ struct wavelet {
       return;
 
     auto p = b.get(idx);
-    int lf = p->y;
+    int lf = p->l ? p->l->y : 0;
+    int x = p->x;
     b.erase(idx);
-    if(p->x == 1)
+    if(x == 1)
       l->erase(lf);
     else
       r->erase(idx-lf);
@@ -258,6 +259,6 @@ int main() {
   int n = 100000;
   for(int i = 0; i < n; ++i)
     t.insert(i, i+1);
-
-  cout << t.kth(0, n, 15683);
+  t.erase(0);n--;
+  cout << t.kth(0, n, 15689);
 }
