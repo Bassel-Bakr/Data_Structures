@@ -29,17 +29,20 @@ struct wavelet_matrix {
     }
   }
 
+  int rank0(int bit, int i) {
+    return b[bit][i >> 5].second +
+           __builtin_popcount(b[bit][i >> 5].first & ((1u << (i & 31)) - 1u));
+  }
+
+  int rank1(int bit, int i) { return i - rank0(bit, i); }
+
   // kth number in range [l, r]
   int kth(int l, int r, int k) {
     r++;  // switch to [l, r) indexing for convinence
     int ans = 0;
     for (int bit = logn - 1; bit >= 0; --bit) {
-      int lf =
-          b[bit][l >> 5].second +
-          __builtin_popcount(b[bit][l >> 5].first & ((1u << (l & 31)) - 1u));
-      int rg =
-          b[bit][r >> 5].second +
-          __builtin_popcount(b[bit][r >> 5].first & ((1u << (r & 31)) - 1u));
+      int lf = rank0(bit, l);
+      int rg = rank0(bit, r);
       if (k <= rg - lf) {
         l = lf;
         r = rg;
