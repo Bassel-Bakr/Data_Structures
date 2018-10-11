@@ -63,7 +63,7 @@
       (let [r (remove r v)]
         (assoc p
           :r r
-      	 	  :s (+ (size l) 1 (size r))))
+          :s (+ (size l) 1 (size r))))
     :else (join l r)))
 
 (defn remove-range [p l r]
@@ -84,3 +84,9 @@
     (if (nil? f)
       t
       (recur (insert t f) r))))
+
+(defmacro infix
+  ([a] (if (seq? a)`(infix ~@a) a))
+  ([a b c] (list `(infix ~b)
+                 `(infix ~a)
+                 `(infix ~c))))
