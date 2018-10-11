@@ -84,9 +84,3 @@
     (if (nil? f)
       t
       (recur (insert t f) r))))
-
-(defmacro infix
-  ([a] (if (seq? a)`(infix ~@a) a))
-  ([a b c] (list `(infix ~b)
-                 `(infix ~a)
-                 `(infix ~c))))
