@@ -69,7 +69,7 @@ struct treap {
     return p->upd();
   }
 
-  node *erase(node *p, int x) {
+  node *erase(node *p, T const &x) {
     if (not p) return 0;
     if (f(x, p->x)) {
       p->l = erase(p->l, x);
@@ -86,8 +86,8 @@ struct treap {
     return p;
   }
 
-  void insert(int x) { root = insert(root, new node(x, rand())); }
-  void erase(int x) { root = erase(root, x); }
+  void insert(T const &x) { root = insert(root, new node(x, rand())); }
+  void erase(T const &x) { root = erase(root, x); }
 
   int print(node *p) {
     if (not p) return 0;
