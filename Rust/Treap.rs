@@ -1,6 +1,7 @@
 use std::{cmp, mem};
 
 fn main() {
+    srnd();
     let mut t = Treap::new();
     let n = 1_00_000;
     for i in 0..n {
