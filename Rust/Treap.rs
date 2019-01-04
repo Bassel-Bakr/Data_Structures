@@ -46,11 +46,6 @@ impl<T: Ord + std::fmt::Display> Treap<T> {
         self.root = Treap::join(Treap::join(l, Node::new_wrapped(x)), r);
     }
 
-    fn erase(&mut self, x: T) {
-        let p = mem::replace(&mut self.root, None);
-        self.root = Treap::erase_node(p, x);
-    }
-
     fn print(&self) -> u32 {
         Treap::print_subtree(&self.root)
     }
