@@ -4,7 +4,7 @@ using ll = long long;
 
 template < class T > struct node {
   T x;
-  int s = 1;
+  unsigned int s = color_mask | 1;
 
   node *k[2] = { };
 
@@ -17,19 +17,33 @@ template < class T > struct node {
     delete k[1];
   }
 
+  static unsigned int const color_mask = ~INT_MAX;
+  static unsigned int const size_mask = INT_MAX;
+
+  static inline int size(node * p) {
+    return p ? (p->s & size_mask) : 0;
+  }
+
   static inline bool is_red(node * p) {
-    return p ? p->s : 0;
+    return p ? (p->s & color_mask) : 0;
   }
 
   // 1 red, 0 black
-  static inline void set(node * p, int c) {
-    p->s = c;
+  static inline void set(node * p, unsigned int c) {
+    p->s = (c << 31) | (p->s & size_mask);
   }
 
   static inline void flip(node * p) {
-    p->s = 1;
-    p->k[0]->s = 0;
-    p->k[1]->s = 0;
+    p->s |= color_mask;
+    p->k[0]->s &= size_mask;
+    p->k[1]->s &= size_mask;
+  }
+
+  static inline void swap_colors(node * l, node * r) {
+    auto lc = l->s & color_mask;
+    auto rc = r->s & color_mask;
+    l->s = rc | (l->s & size_mask);
+    r->s = lc | (r->s & size_mask);
   }
 
   // 0 left, 1 right
@@ -37,9 +51,14 @@ template < class T > struct node {
     int o = d ^ 1;
     auto c = k[o];
     k[o] = c->k[d];
-    c->k[d] = this;
-    swap(c->s, s);
-    return c;
+    c->k[d] = upd();
+    swap_colors(c, this);
+    return c->upd();
+  }
+
+  node *upd() {
+    s = (s & color_mask) + size(k[0]) + 1 + size(k[1]);
+    return this;
   }
 };
 
@@ -49,7 +68,9 @@ template < class T > struct rbt {
 
   ~rbt() {
     delete root;
-  } tnode *insert(tnode * p, T const &x) {
+  }
+
+  tnode *insert(tnode * p, T const &x) {
     if (not p)
       return new tnode(x);
     int d = (x >= p->x);
@@ -96,7 +117,7 @@ template < class T > struct rbt {
       fam = p;
 
     p->k[d] = erase(p->k[d], x, fam);
-    
+
     return fix_erase(p, d);
   }
 
@@ -118,6 +139,7 @@ template < class T > struct rbt {
         // done yaaay
         b = 0;
         tnode::set(kid, 0);
+        p->upd();
       } else if (tnode::is_red(p->k[o])) {
         // is sibling red?
         // rotate towards me
@@ -140,6 +162,7 @@ template < class T > struct rbt {
         } else {
           // both nephews are black! make bro red to even sides
           tnode::set(p->k[o], 1);
+          p->upd();
         }
       }
       return p;
@@ -161,24 +184,26 @@ template < class T > struct rbt {
         p = p->rot(o);
       } else if (tnode::is_red(kid->k[o])) {
         // double rotation
-        kid->rot(d);
+        p->k[d] = kid->rot(d);
         p = p->rot(o);
       }
     }
-    return p;
+    return p->upd();
   }
 
   int print(tnode * p) {
     if (not p)
       return 0;
     auto l = print(p->k[0]);
-    //cout << p->x << '\n';
+    // cout << p->x << '\n';
     auto r = print(p->k[1]);
     // black height
     assert(l == r);
     // double red
     assert(not(tnode::is_red(p)
                && (tnode::is_red(p->k[0]) || tnode::is_red(p->k[1]))));
+    // subtree size
+    assert(tnode::size(p) == tnode::size(p->k[0]) + 1 + tnode::size(p->k[1]));
     return not(tnode::is_red(p)) + max(l, r);
   }
 
@@ -198,7 +223,7 @@ int main()
   for (int i = 0; i < n; ++i) {
     t.insert(i);
   }
-  
+
   for (int i = 0; i < n / 2; ++i) {
     auto v = rand() % n;
     t.erase(v);
