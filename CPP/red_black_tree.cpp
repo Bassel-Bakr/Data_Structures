@@ -69,7 +69,7 @@ template < class T > struct rbt {
   ~rbt() {
     delete root;
   }
-
+  
   tnode *insert(tnode * p, T const &x) {
     if (not p)
       return new tnode(x);
@@ -80,7 +80,6 @@ template < class T > struct rbt {
 
   void insert(T x) {
     root = insert(root, x);
-    tnode::set(root, 0);
   }
 
   int b;
@@ -124,8 +123,6 @@ template < class T > struct rbt {
   void erase(T x) {
     b = 0;
     root = erase(root, x, 0);
-    if (root)
-      tnode::set(root, 0);
     b = 0;
   }
 
