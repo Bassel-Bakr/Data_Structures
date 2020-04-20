@@ -1,100 +1,78 @@
-#include <bits/stdc++.h>
-
+#include<bits/stdc++.h>
 using namespace std;
+using ll = long long;
 
-struct suffix_array {  
-  int n;
-  vector<int> sa, lcp, rev, rad;
+vector<int> suf_con(string const& s) {
+  int n = s.size();
   
-  struct suffix {
-    int i, x, y;
-  };
-
-  void radix_sort(vector<suffix>& suf, vector<suffix>& tmp) {
-    int mx = 0;
-    for (int i = 0; i < n; ++i)
-        mx = max({mx, suf[i].x, suf[i].y});
-
-    rad.resize(mx+1);
-    fill(rad.begin(), rad.end(), 0);
-    for (int i = 0; i < n; ++i)
-      ++rad[suf[i].y];
-    partial_sum(rad.begin(), rad.end(), rad.begin());
-    for (int i = n - 1; i >= 0; --i)
-      tmp[--rad[suf[i].y]] = suf[i];
-
-    fill(rad.begin(), rad.end(), 0);
-    for (int i = 0; i < n; ++i)
-      ++rad[tmp[i].x];
-    partial_sum(rad.begin(), rad.end(), rad.begin());
-    for (int i = n - 1; i >= 0; --i)
-      suf[--rad[tmp[i].x]] = tmp[i];
-  }
-
-  suffix_array(string const &w) {
-    n = w.size();
-    rev.resize(n);
-    vector<suffix> suf(n), tmp(n);
-
-    for (int i = 0; i < n; ++i)
-      suf[i] = {i, w[i], 0};
-
-    int p = 1;
-    do {
-      radix_sort(suf, tmp);
-      int x = suf[0].x;
-      suf[0].x = 1;
-      for (int i = 1; i < n; ++i) {
-        int x2 = suf[i].x, y2 = suf[i].y;
-        suf[i].x = suf[i - 1].x + (x != x2 || suf[i].y != suf[i - 1].y);
-        x = x2;
-      }
-      // update rev
-      for (int i = 0; i < n; ++i)
-        rev[suf[i].i] = i;
-      // update minor
-      for (int i = 0; i < n; ++i) {
-        int next = suf[i].i + p;
-        suf[i].y = next < n ? suf[rev[next]].x : 0;
-      }
-      p <<= 1;
+  if(n == 0) return {};
+  
+  vector<int> cnt, sa(n), tmp(n), rank[2];
+  rank[0].resize(n);
+  rank[1].resize(n);
+  
+  iota(sa.begin(), sa.end(), 0);
+  for(int i = 0; i < n; ++i)
+    rank[0][sa[i]] = s[sa[i]];
+    
+  for(int len = 0; len < n; len = max(1, 2 * len)) {
+    for(auto x : sa)
+      rank[1][x] = (x + len < n) ? rank[0][x + len] : 0;
+      
+    int m = 1 + rank[0][sa.back()];
+    if(not len)
+      m = 1 + *max_element(rank[0].begin(), rank[0].end());
+    
+    for(int r = 1; r >= 0; --r) {
+      swap(sa, tmp);
+      cnt.assign(m, 0);
+      for(auto x : tmp)
+        ++cnt[rank[r][x]];
+      partial_sum(cnt.begin(), cnt.end(), cnt.begin());
+      for(int i = n - 1; i >= 0; --i)
+        sa[--cnt[rank[r][tmp[i]]]] = tmp[i];
     }
-    while (suf[n - 1].x != n);
+    
+    for(int i = 0, j = 0, k = 1; i < n; i = j, ++k) {
+      int r0 = rank[0][sa[i]];
+      int r1 = rank[1][sa[i]];
+      while(j < n && r0 == rank[0][sa[j]] && r1 == rank[1][sa[j]])
+        rank[0][sa[j++]] = k;
+    }    
+    
+    if(rank[0][sa.back()] == n) break;
+  }  
+  return sa;
+}
 
-    sa.resize(n);
-    for (int i = 0; i < n; ++i)
-      sa[i] = suf[i].i;
-  }
-
-  void build_lcp(string const &w) {
-    lcp.resize(n);
-    for(int i = 0, k = 0; i < n; ++i, k -= k>0) {
-      int idx = rev[i];
-      if(idx == n-1) {
-        k = 0;
-      } else {
-        while(sa[idx]+k < n && sa[idx+1]+k < n &&
-              w[sa[idx]+k] == w[sa[idx+1]+k])
-          k++;
-      }
-      lcp[idx] = k;
+vector<int> lcp_con(string const &w, vector<int> const& sa, vector<int> const& rev) {
+  int n = w.size();
+  vector<int> lcp(n);
+  for(int i = 0, k = 0; i < n; ++i, k -= k>0) {
+    int idx = rev[i];
+    if(idx == n-1) {
+      k = 0;
+    } else {
+      while(sa[idx]+k < n &&
+            sa[idx+1]+k < n &&
+            w[sa[idx]+k] == w[sa[idx+1]+k])
+        k++;
     }
-  } 
-
-  int operator[](int i) {
-    return sa[i];
+    lcp[idx] = k;
   }
-};
+  return lcp;
+} 
 
-int main() {
+
+int main()
+{
   cin.tie(0);
   cin.sync_with_stdio(0);
 
-  string s;
-  cin >> s;
-  int n = s.size();
-  suffix_array sa(s);
-  sa.build_lcp(s);
-  for(int i = 0; i < n; ++i)
-    cout << sa.lcp[i] << " " << &s[sa[i]] << "\n";
+  string s = "banana";
+  
+  auto sa = suf_con(s);
+  
+  for(int i = 0; i < int(s.size()); ++i)
+    cout << sa[i] << ' ' << s.substr(sa[i], s.size()) << endl;
 }
