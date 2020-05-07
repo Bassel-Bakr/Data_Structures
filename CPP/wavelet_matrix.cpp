@@ -1,59 +1,74 @@
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
 using ll = long long;
 
 struct wavelet_matrix {
   int n;
-  int blk;
-  int logn;
+  uint mask;
+  uint logn;
   vector<int> z;
-  vector<vector<pair<int, int>>> b;
+  vector<vector<int>> s;
+  vector<vector<int>> b[2];
 
-  wavelet_matrix(vector<int>& a) {
-    n = a.size();
-    blk = (n + 32) >> 5;
-    logn = 32 - __builtin_clz(*max_element(a.begin(), a.end()));
-    // resize
-    z.assign(logn, 0);
-    b.assign(logn, vector<pair<int, int>>(blk));
-    // build
-    for (int bit = logn - 1; bit >= 0; --bit) {
-      auto f = [bit](int x) { return not(x >> bit & 1); };
-      auto& b = this->b[bit];
-      for (int i = 0; i < n; ++i)
-        if (f(a[i])) b[i >> 5].first |= 1u << (i & 31);
-      for (int i = 1; i < blk; ++i)
-        b[i].second = b[i - 1].second + __builtin_popcount(b[i - 1].first);
-      auto zeros = stable_partition(a.begin(), a.end(), f);
-      z[bit] = distance(a.begin(), zeros);
-    }
-  }
-
-  int rank0(int bit, int i) {
-    return b[bit][i >> 5].second +
-           __builtin_popcount(b[bit][i >> 5].first & ((1u << (i & 31)) - 1u));
-  }
-
-  int rank1(int bit, int i) { return i - rank0(bit, i); }
-
-  // kth number in range [l, r]
-  int kth(int l, int r, int k) {
-    r++;  // switch to [l, r) indexing for convinence
-    int ans = 0;
-    for (int bit = logn - 1; bit >= 0; --bit) {
-      int lf = rank0(bit, l);
-      int rg = rank0(bit, r);
-      if (k <= rg - lf) {
-        l = lf;
-        r = rg;
-      } else {
-        ans |= 1u << bit;
-        k -= rg - lf;
-        l += z[bit] - lf;
-        r += z[bit] - rg;
+  template <class Iter>
+  wavelet_matrix(Iter pl, Iter pr) {
+    auto tmp = vector<int>(pl, pr);
+    n = int(tmp.size());
+    mask = ~0u;
+    logn = 32;
+    z.resize(logn);
+    b[0].assign(logn + 1, vector<int>(n + 1));
+    b[1].assign(logn + 1, vector<int>(n + 1));
+    s.assign(logn + 1, vector<int>(n + 1));
+    for (int j = logn; j >= 0; --j) {
+      int cnt[2] = {};
+      auto& zero = b[0][j];
+      auto& one = b[1][j];
+      auto f = [j](int x) { return (((x ^ (1u << 31)) >> (j - 1)) & 1) ^ 1; };
+      for (int i = 0; i < n; ++i) {
+        if (j) cnt[f(tmp[i]) ^ 1] += 1;
+        zero[i + 1] = cnt[0];
+        one[i + 1] = cnt[1];
+        s[j][i + 1] = s[j][i] + tmp[i];
       }
+      z[j] = cnt[0];
+      if (j) stable_partition(tmp.begin(), tmp.end(), f);
     }
-    return ans;
+  }
+
+  int sum(int l, int r, uint a, uint b) {
+    return sum(logn, l, r + 1, a ^ (1u << 31), b ^ (1u << 31), 0, mask);
+  }
+
+  // [l, r)
+  int sum(int i, int l, int r, uint a, uint t, uint A, uint Z) {
+    if (l >= r) {
+      return 0;
+    }
+
+    if (a <= A && Z <= t) {
+      return s[i][r] - s[i][l];
+    }
+
+    uint mid = A + (Z - A) / 2;
+    int x = 0;
+    if (a <= mid) x += sum(i - 1, b[0][i][l], b[0][i][r], a, t, A, mid);
+    if (mid < t)
+      x += sum(i - 1, z[i] + b[1][i][l], z[i] + b[1][i][r], a, t, mid + 1, Z);
+    return x;
+  }
+
+  int kth(int l, int r, int k) { return kth(logn, l, r + 1, k, 0, mask); }
+
+  int kth(int i, int l, int r, int k, uint A, uint Z) {
+    if (A == Z) return A ^ (1u << 31);
+    uint mid = A + (Z - A) / 2;
+    int zeros = b[0][i][r] - b[0][i][l];
+    if (k <= zeros)
+      return kth(i - 1, b[0][i][l], b[0][i][r], k, A, mid);
+    else
+      return kth(i - 1, z[i] + b[1][i][l], z[i] + b[1][i][r], k - zeros,
+                 mid + 1, Z);
   }
 };
 
@@ -61,18 +76,15 @@ int main() {
   cin.tie(0);
   cin.sync_with_stdio(0);
 
-  int n, m;
-  cin >> n >> m;
-  vector<int> a(n);
-  for (auto& x : a) cin >> x;
-  auto b = a;
-  sort(b.begin(), b.end());
-  b.resize(unique(b.begin(), b.end()) - b.begin());
-  for (auto& x : a) x = lower_bound(b.begin(), b.end(), x) - b.begin();
-  wavelet_matrix wx(a);
-  while (m--) {
-    int l, r, k;
-    cin >> l >> r >> k;
-    cout << b[wx.kth(l - 1, r - 1, k)] << '\n';
+  int n = 8;
+  auto a = vector<int>(n);
+  iota(a.begin(), a.end(), -5);
+
+  wavelet_matrix wm(a.begin(), a.end());
+
+  cout << wm.sum(0, n - 1, -5, 0) << endl;
+
+  for (int i = 0; i < n; ++i) {
+    cout << wm.kth(0, n - 1, i + 1) << endl;
   }
 }
