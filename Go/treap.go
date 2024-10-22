@@ -61,7 +61,6 @@ func (node *Node[T]) print() {
 }
 
 func main() {
-
 	var t *Node[int]
 
 	for i := range 100_000 {
